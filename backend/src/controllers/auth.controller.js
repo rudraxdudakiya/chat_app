@@ -34,13 +34,13 @@ export const signup = async (req, res) => {
         });
 
         if(newUser) {
-            generateToken(newUser._id, res); // generate token for the new user
-            await newUser.save(); 
+            const savedUser = await newUser.save(); 
+            generateToken(savedUser._id, res); // generate token for the new user
             return res.status(201).json({
-                _id: newUser._id,
-                fullname: newUser.fullname,
-                email: newUser.email,
-                profilePicture: newUser.profilePicture,
+                _id: savedUser._id,
+                fullname: savedUser.fullname,
+                email: savedUser.email,
+                profilePicture: savedUser.profilePicture,
             });
         } else {
             return res.status(400).json({message: "Invalid user data"});

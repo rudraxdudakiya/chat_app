@@ -28,7 +28,13 @@ app.get("*", (_, res)=>{
   res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
 })
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-  connectDB();
-});
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Database connection failed:", error);
+    process.exit(1); // Exit the process with failure
+  });
