@@ -1,8 +1,9 @@
 import User from "../models/User.model.js"
 import bcrypt from "bcryptjs";
+import cloudinary from "../lib/cloudinary.js";
 import { generateToken } from "../lib/util.js";
 import { sendWelcomeEmail } from "../emails/emailHandler.js";
-import ENV from "../lib/env.js";
+import { ENV } from "../lib/env.js";
 
 export const signup = async (req, res) => {
     const {fullname, email, password} = req.body;
@@ -59,7 +60,7 @@ export const signup = async (req, res) => {
         console.log("Error in signup controller:", error);
         res.status(500).json({message: "Internal Server Error"});
     }
-};
+}
 
 export const login = async (req, res) => {
     const {email, password} = req.body;
@@ -92,4 +93,30 @@ export const login = async (req, res) => {
 export const logout = (_, res) => {
     res.cookie("jwt", "", { maxAge: 0 }); // clear the cookie
     res.status(200).json({message: "Logged out successfully"});
+}
+
+export const editProfile = async (req, res) => {
+    const { fullname, profilePicture } = req.body;
+    if(!profilePicture) {
+        return res.status(400).json({ message: "Profile picture is required" });
+    }
+    try {
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const uploadResponse = await cloudinary.uploader.upload(profilePicture);
+        const updatedUser = await User.findByIdAndUpdate(
+            req.user._id,
+            {
+                fullname: fullname || user.fullname,
+                profilePicture: uploadResponse.secure_url,
+            },
+            { new: true }
+        ).select("-password");
+        res.status(200).json(updatedUser);
+    } catch (error) {
+        console.error("Error in editProfile controller:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 }
