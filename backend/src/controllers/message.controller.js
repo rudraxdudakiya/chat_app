@@ -1,3 +1,4 @@
+import cloudinary from "../lib/cloudinary.js";
 import Message from "../models/message.model.js";
 import User from "../models/User.model.js";
 
@@ -57,20 +58,35 @@ export const getAllChatPartners = async (req, res) => {
 }
 
 export const sendMessage = async (req, res) => {
-    const {id: receiverId} = req.params;
-    const loggedUserId = req.user._id;
-    const {text, image} = req.body;
-
     try {
+        const {id: receiverId} = req.params;
+        const loggedUserId = req.user._id;
+        const {text, image} = req.body;
+
+        const receiverExists = await User.exists({ _id: receiverId });
+        if (!receiverExists) {
+        return res.status(404).json({ message: "Receiver not found." });
+        }
+        
+        if(receiverId.toString() === loggedUserId.toString()) {
+            return res.status(400).json({message: "You cannot send a message to yourself"});
+        }
+        
         if(!text && !image) {
             return res.status(400).json({message: "Message content cannot be empty"});
         }
+
+        let imageurl = null;
+        const uploadResult = await cloudinary.uploader.upload(image);
+        imageurl = uploadResult.secure_url;
+
         const newMessage = new Message({
             senderId: loggedUserId,
             receiverId: receiverId,
             text,
-            image
+            image: imageurl
         });
+
         await newMessage.save();
         res.status(201).json(newMessage);
         // socket.io --
