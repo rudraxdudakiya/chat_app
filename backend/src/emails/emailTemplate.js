@@ -34,7 +34,7 @@ export function createWelcomeEmailTemplate(name, clientURL) {
           <div class="card">
             <div class="header">
               <div style="text-align:center;">
-                <img class="logo" src="https://cdn-icons-png.flaticon.com/512/646/646094.png" alt="ChitChat" style="width:72px;height:72px;object-fit:contain;margin:0 auto 12px;display:block;">
+                <img class="logo" src="./logo.svg" alt="ChitChat Logo" />
                 <div style="font-size:18px; font-weight:700;">Welcome to ChitChat</div>
                 <div style="font-size:13px; opacity:0.95; margin-top:4px;">Messaging made simple</div>
               </div>
