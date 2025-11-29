@@ -1,0 +1,57 @@
+import { create } from "zustand"
+import axiosInstance from "../lib/axios"
+import toast from "react-hot-toast";
+
+export const useAuthStore = create((set) => ({
+    authUser: null,
+    isAuthChecking: true,
+    isLoggingIn: false,
+    isSigningUp: false, 
+    checkAuth: async () => {
+        try {
+            const res = await axiosInstance.get("/auth/check-auth");
+            set({ authUser: res.data.user });
+        } catch (err) {
+            console.error("Auth check failed: ", err);
+        } finally {
+            set({ isAuthChecking: false });
+        }
+    },
+    signup: async (formData) => {
+        set({ isSigningUp: true });
+        try {
+            const res = await axiosInstance.post("/auth/signup", formData);
+            toast.success("Signup successful!");
+            return { success: true, data: res.data };
+        } catch (err) {
+            console.error("Signup failed: ", err);
+            toast.error(err.response?.data?.message || "Signup failed. Please try again.");
+            return { success: false, error: err };
+        } finally {
+            set({ isSigningUp: false});
+        }
+    },
+    login: async (formData) => {
+        set({ isLoggingIn: true });
+        try {
+            const res = await axiosInstance.post("/auth/login", formData);
+            toast.success("Login successful");
+            set({ authUser: res.data.user });
+        } catch (err) {
+            console.error("Login failed: ", err);
+            toast.error(err.response?.data?.message || "Login failed. Please try again.");
+        } finally {
+            set({ isLoggingIn: false });
+        }
+    },
+    logout: async () => {
+        try {
+            await axiosInstance.post("/auth/logout");
+            set({ authUser: null });
+            toast.success("Logged out successfully");
+        } catch (err) {
+            console.error("Logout failed: ", err);
+            toast.error("Logout failed. Please try again.");
+        }
+    }
+}));
