@@ -9,7 +9,7 @@ function ActiveTabSwitch() {
           role="tab"
           onClick={() => setActiveTab("chats")}
           aria-selected={activeTab === "chats"}
-          className={`w-full rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+          className={`w-full rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none  ${
             activeTab === "chats"
               ? "bg-cyan-500/20 text-cyan-400"
               : "bg-slate-800 text-slate-400 hover:bg-slate-700"
@@ -22,7 +22,7 @@ function ActiveTabSwitch() {
           role="tab"
           onClick={() => setActiveTab("contacts")}
           aria-selected={activeTab === "contacts"}
-          className={`w-full rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-cyan-500 ${
+          className={`w-full rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none  ${
             activeTab === "contacts"
               ? "bg-cyan-500/20 text-cyan-400"
               : "bg-slate-800 text-slate-400 hover:bg-slate-700"

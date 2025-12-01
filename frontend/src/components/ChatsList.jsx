@@ -4,7 +4,7 @@ import UsersLoadingSkeleton from "./UserSkelaton";
 import NoChatsFound from "./NoChatsFound";
 
 function ChatsList() {
-  const { fetchAllChatPartners, allChatPartners, isUsersLoading, setSelectedChatPartner } = useChatStore();
+  const { fetchAllChatPartners, allChatPartners, setSelectedChatPartner, isUsersLoading } = useChatStore();
 
   useEffect(() => { 
     fetchAllChatPartners();
@@ -19,7 +19,7 @@ function ChatsList() {
         <div 
           key={chat._id}
           className="bg-cyan-500/10 p-4 hover:bg-cyan-500/20 cursor-pointer transition-colors rounded-lg"
-          onClick={() => setSelectedChatPartner(chat.user)}
+          onClick={() => setSelectedChatPartner(chat)}
         > 
           <div className="flex items-center gap-3">
             <div className="avatar avatar-online">
