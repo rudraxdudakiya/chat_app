@@ -63,23 +63,23 @@ export const sendMessage = async (req, res) => {
         const loggedUserId = req.user._id;
         const {text, image} = req.body;
 
+        if (!text && !image) {
+           return res.status(400).json({ message: "Text or image is required." });
+        }
+        if (loggedUserId.equals(receiverId)) {
+            return res.status(400).json({ message: "Cannot send messages to yourself." });
+        }
         const receiverExists = await User.exists({ _id: receiverId });
         if (!receiverExists) {
-        return res.status(404).json({ message: "Receiver not found." });
-        }
-        
-        if(receiverId.toString() === loggedUserId.toString()) {
-            return res.status(400).json({message: "You cannot send a message to yourself"});
-        }
-        
-        if(!text && !image) {
-            return res.status(400).json({message: "Message content cannot be empty"});
+            return res.status(404).json({ message: "Receiver not found." });
         }
 
         let imageurl = null;
-        const uploadResult = await cloudinary.uploader.upload(image);
-        imageurl = uploadResult.secure_url;
-
+        if (image) {
+            const uploadResult = await cloudinary.uploader.upload(image);
+            imageurl = uploadResult.secure_url;
+        }
+        
         const newMessage = new Message({
             senderId: loggedUserId,
             receiverId: receiverId,

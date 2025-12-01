@@ -12,7 +12,7 @@ function App() {
 
    useEffect(() => {
       checkAuth();
-   }, [checkAuth]);
+   }, [checkAuth, authUser]);
 
    if (isAuthChecking) return <PageLoader />;
    
@@ -31,7 +31,7 @@ function App() {
          </Routes>
 
          <Toaster />
-         <a
+         {/* <a
                 href="/"
                 aria-label="App Home"
                 className="fixed bottom-4 right-4 inline-flex items-center justify-center"
@@ -41,7 +41,7 @@ function App() {
                    alt="App logo"
                    className="w-10 h-10 rounded-lg shadow transition transform hover:scale-125"
                 />
-             </a>
+             </a> */}
       </div>
    )
 }
