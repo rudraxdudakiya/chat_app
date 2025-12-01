@@ -10,10 +10,12 @@ export const useChatStore = create((set,get) => ({
     activeTab: 'chats',
     selectedChatPartner: null,
     isSoundOn: localStorage.getItem("isSoundOn") === true,
+    isMessagesLoading: false,
 
     setActiveTab: (tab) => set({ activeTab: tab }),
     
-    setSelectedChatPartner: (partner) => set({ selectedChatPartner: partner }),
+    setSelectedChatPartner: (partner) => {set({ selectedChatPartner: partner }); console.log(partner);
+    },
 
     toggleSound: () => { 
         localStorage.setItem("isSoundOn", (!get().isSoundOn).toString()); 
@@ -47,7 +49,7 @@ export const useChatStore = create((set,get) => ({
     },
 
     fetchAllMessages: async (userId) => {
-        set({ isUsersLoading: true });
+        set({ isMessagesLoading: true });   
         try {
             const res = await axiousInstance.get(`/messages/${userId}`);
             set({ allMessages: res.data });
@@ -56,7 +58,20 @@ export const useChatStore = create((set,get) => ({
             console.error('Failed to fetch messages: ', err);
             toast.error('Failed to load messages. Please try again.');
         } finally {
-            set({ isUsersLoading: false });
+            set({ isMessagesLoading: false });
+        }
+    },
+
+    fetchAllMessagesByUserId: async (userId) => {
+        set({ isMessagesLoading: true });
+        try {
+            const res = await axiousInstance.get(`/messages/${userId}`);
+            set({ allMessages: res.data });
+        } catch (err) {
+            console.error('Failed to fetch messages: ', err);
+            toast.error('Failed to load messages. Please try again.');
+        } finally {
+            set({ isMessagesLoading: false });
         }
     },
 }));
