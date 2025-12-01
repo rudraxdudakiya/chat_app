@@ -7,10 +7,11 @@ export const useAuthStore = create((set) => ({
     isAuthChecking: true,
     isLoggingIn: false,
     isSigningUp: false, 
+    isUpdatingProfile: false,
     checkAuth: async () => {
         try {
             const res = await axiosInstance.get("/auth/check-auth");
-            set({ authUser: res.data.user });
+            set({ authUser: res.data });
         } catch (err) {
             console.error("Auth check failed: ", err);
         } finally {
@@ -36,12 +37,13 @@ export const useAuthStore = create((set) => ({
         try {
             const res = await axiosInstance.post("/auth/login", formData);
             toast.success("Login successful");
-            set({ authUser: res.data.user });
+            set({ authUser: res.data });
         } catch (err) {
             console.error("Login failed: ", err);
             toast.error(err.response?.data?.message || "Login failed. Please try again.");
         } finally {
             set({ isLoggingIn: false });
+            window.location.reload();
         }
     },
     logout: async () => {
@@ -53,5 +55,18 @@ export const useAuthStore = create((set) => ({
             console.error("Logout failed: ", err);
             toast.error("Logout failed. Please try again.");
         }
-    }
+    },
+    updateProfile: async (updateData) => {
+        set({ isUpdatingProfile: true });
+        try {
+            const res = await axiosInstance.put("/auth/edit-profile", updateData);
+            set((state) => ({ authUser: { ...state.authUser, ...res.data } }));
+            toast.success("Profile updated successfully");
+        } catch (err) {
+            console.error("Profile update failed: ", err);
+            toast.error("Profile update failed. Please try again.");
+        } finally {
+            set({ isUpdatingProfile: false });
+        }
+    },
 }));
