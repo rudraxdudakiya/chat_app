@@ -20,15 +20,40 @@ app.use(cors({origin: ENV.CLIENT_URL, credentials: true})); // enabling CORS for
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRouter);
 
-// for deployement
+// Health check endpoint
+app.get("/api/health", (req, res) => {
+  res.json({ status: "Backend is running!", timestamp: new Date().toISOString() });
+});
+
+// for deployement - only serve frontend if dist folder exists
 if(ENV.NODE_ENV === "production") {
-  app.use(
-    express.static(path.join(__dirname, "../frontend/dist"))
-  );
+  const frontendPath = path.join(__dirname, "../frontend/dist");
+  const fs = await import('fs');
+  
+  if (fs.existsSync(frontendPath)) {
+    app.use(express.static(frontendPath));
+    
+    app.get("*", (req, res) => {
+      // Don't serve index.html for API routes
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ message: "API route not found" });
+      }
+      res.sendFile(path.join(frontendPath, "index.html"));
+    });
+  } else {
+    console.log("Frontend dist folder not found - running as API-only backend");
+    app.get("*", (req, res) => {
+      if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ message: "API route not found" });
+      }
+      res.json({ 
+        message: "Chat App Backend API", 
+        frontend: "Deploy frontend separately",
+        health: "/api/health"
+      });
+    });
+  }
 }
-app.get("*", (_, res)=>{
-  res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-})
 
 connectDB()
   .then(() => {

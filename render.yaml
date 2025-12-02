@@ -1,0 +1,37 @@
+services:
+  # Backend API Service
+  - type: web
+    name: chat-app-backend
+    runtime: node
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        value: https://your-frontend-app.onrender.com
+      - key: MONGODB_URI
+        sync: false  # Set this in Render dashboard
+      - key: JWT_SECRET
+        sync: false  # Set this in Render dashboard
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: ARCJET_KEY
+        sync: false
+
+  # Frontend Static Site
+  - type: web
+    name: chat-app-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    envVars:
+      - key: VITE_BACKEND_URL
+        value: https://your-backend-app.onrender.com
