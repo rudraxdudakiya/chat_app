@@ -46,10 +46,11 @@ export const useAuthStore = create((set, get) => ({
             toast.success("Login successful");
             set({ authUser: res.data });
             get().connectSocket();
-            window.location.href = "/";
+            return { success: true, data: res.data }; // Return success for navigation
         } catch (err) {
             console.error("Login failed: ", err);
             toast.error(err.response?.data?.message || "Login failed. Please try again.");
+            return { success: false, error: err }; // Return failure
         } finally {
             set({ isLoggingIn: false });
         }
@@ -60,7 +61,7 @@ export const useAuthStore = create((set, get) => ({
             set({ authUser: null });
             toast.success("Logged out successfully");
             // get().disconnectSocket();
-            window.location.href = "/";
+            // window.location.href = "/";
         } catch (err) {
             console.error("Logout failed: ", err);
             toast.error("Logout failed. Please try again.");

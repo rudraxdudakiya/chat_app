@@ -2,7 +2,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { Loader, LockIcon, Mail } from "lucide-react";
 import BorderAnimatedContainer from "../components/BorderAnimated"
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 function LoginPage() {
   const [formData, setFormData] = useState({
@@ -10,10 +10,14 @@ function LoginPage() {
     password: "",
   });
   const { login, isLoggingIn } = useAuthStore();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login(formData);
+    const result = await login(formData);
+    if (result.success) {
+      navigate("/"); // Navigate to home on successful login
+    }
     setFormData({ email: "", password: "" });
   };
 
