@@ -1,6 +1,6 @@
 import cloudinary from "../lib/cloudinary.js";
-import { getReceiverSocketId, io } from "../lib/soketio.js";
-import Message from "../models/message.model.js";
+import { getReceiverSocketId, io } from "../lib/soketio.js";        
+import Message from "../models/Message.model.js";
 import User from "../models/User.model.js";
 
 export const getContacts = async (req, res) => {
