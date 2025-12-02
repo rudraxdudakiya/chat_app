@@ -1,4 +1,5 @@
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io } from "../lib/soketio.js";
 import Message from "../models/message.model.js";
 import User from "../models/User.model.js";
 
@@ -88,8 +89,12 @@ export const sendMessage = async (req, res) => {
         });
 
         await newMessage.save();
-        res.status(201).json(newMessage);
         // socket.io --
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
+        res.status(201).json(newMessage);
     } catch (error) {
         console.error("Error sending message:", error);
         res.status(500).json({ message: "Internal server error" });

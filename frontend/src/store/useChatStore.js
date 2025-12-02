@@ -10,7 +10,7 @@ export const useChatStore = create((set,get) => ({
     isUsersLoading: false,
     activeTab: 'chats',
     selectedChatPartner: null,
-    isSoundOn: localStorage.getItem("isSoundOn") === true,
+    isSoundOn: localStorage.getItem("isSoundOn") === "true",
     isMessagesLoading: false,
 
     setActiveTab: (tab) => set({ activeTab: tab }),
@@ -100,5 +100,39 @@ export const useChatStore = create((set,get) => ({
             console.error('Failed to send message: ', err);
             toast.error('Failed to send message. Please try again.');
         }
+    },
+
+    subscribeToMessages: () => {
+    const { selectedChatPartner } = get();
+    if (!selectedChatPartner) return;        const socket = useAuthStore.getState().socket;
+
+        socket.on("newMessage", (newMessage) => {
+            const isMessageSentFromselectedChatPartner = newMessage.senderId === selectedChatPartner._id;
+            if (!isMessageSentFromselectedChatPartner) return;
+
+            const currentMessages = get().allMessages;
+            set({ allMessages: [...currentMessages, newMessage] });
+
+            const currentState = get();
+            if (currentState.isSoundOn) {
+                console.log("Playing notification sound, isSoundOn:", currentState.isSoundOn);
+                
+                try {
+                    const notificationSound = new Audio("/sounds/notification.mp3");
+                    notificationSound.currentTime = 0;
+                    
+                    notificationSound.play().catch((e) => {
+                        console.warn("Audio play failed (browser may require user interaction):", e.message);
+                    });
+                } catch (error) {
+                    console.error("Failed to create audio:", error);
+                }
+            }
+        });
+    },
+
+    unsubscribeFromMessages: () => {
+        const socket = useAuthStore.getState().socket;
+        socket.off("newMessage");
     },
 }));
