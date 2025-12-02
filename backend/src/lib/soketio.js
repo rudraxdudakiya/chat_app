@@ -17,6 +17,8 @@ const io = new Server(serverInstance, {
         credentials: true,
         methods: ['GET', 'POST']
     },
+    allowEIO3: true, // Support older clients
+    transports: ['polling', 'websocket'], // Ensure both transports are enabled
 });
 
 io.use(socketAuthMiddleware);
