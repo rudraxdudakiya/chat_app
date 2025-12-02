@@ -24,7 +24,8 @@
     "mern_chatapp": "file:..",
     "mongoose": "^8.10.1",
     "multer": "^2.0.2",
-    "resend": "^6.5.2"
+    "resend": "^6.5.2",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

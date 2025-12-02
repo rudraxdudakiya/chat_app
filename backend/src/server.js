@@ -6,8 +6,8 @@ import { ENV } from "./lib/env.js";
 import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { app, serverInstance } from "./lib/soketio.js";
 
-const app = express();
 const __dirname = path.resolve();
 
 const PORT = ENV.PORT || 3000;
@@ -32,7 +32,7 @@ app.get("*", (_, res)=>{
 
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
+    serverInstance.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   })
