@@ -9,8 +9,13 @@ const serverInstance = http.createServer(app);
 
 const io = new Server(serverInstance, {
     cors: {
-        origin: ENV.CLIENT_URL,
+        origin: [
+            'http://localhost:5173', // Local development
+            'https://chitchat-orpin-six.vercel.app', // Your deployed frontend
+            ENV.CLIENT_URL // Environment variable fallback
+        ].filter(Boolean), // Remove any undefined values
         credentials: true,
+        methods: ['GET', 'POST']
     },
 });
 
