@@ -25,35 +25,15 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "Backend is running!", timestamp: new Date().toISOString() });
 });
 
-// for deployement - only serve frontend if dist folder exists
-if(ENV.NODE_ENV === "production") {
-  const frontendPath = path.join(__dirname, "../frontend/dist");
-  const fs = await import('fs');
-  
-  if (fs.existsSync(frontendPath)) {
-    app.use(express.static(frontendPath));
-    
-    app.get("*", (req, res) => {
-      // Don't serve index.html for API routes
-      if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ message: "API route not found" });
-      }
-      res.sendFile(path.join(frontendPath, "index.html"));
-    });
-  } else {
-    console.log("Frontend dist folder not found - running as API-only backend");
-    app.get("*", (req, res) => {
-      if (req.path.startsWith('/api/')) {
-        return res.status(404).json({ message: "API route not found" });
-      }
-      res.json({ 
-        message: "Chat App Backend API", 
-        frontend: "Deploy frontend separately",
-        health: "/api/health"
-      });
-    });
-  }
-}
+app.use(cors({
+  origin: [
+    'http://localhost:5173', // Keep this for local development
+    'https://chitchat-orpin-six.vercel.app' // Add your deployed frontend URL here
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
+  credentials: true // If you are sending cookies or authorization headers
+}));
+
 
 connectDB()
   .then(() => {
