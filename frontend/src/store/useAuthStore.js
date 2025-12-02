@@ -43,14 +43,13 @@ export const useAuthStore = create((set, get) => ({
         set({ isLoggingIn: true });
         try {
             const res = await axiosInstance.post("/auth/login", formData);
-            toast.success("Login successful");
             set({ authUser: res.data });
+            toast.success("Login successful");
             get().connectSocket();
-            return { success: true, data: res.data }; // Return success for navigation
+            // window.location.href = "/";
         } catch (err) {
             console.error("Login failed: ", err);
             toast.error(err.response?.data?.message || "Login failed. Please try again.");
-            return { success: false, error: err }; // Return failure
         } finally {
             set({ isLoggingIn: false });
         }
@@ -58,10 +57,10 @@ export const useAuthStore = create((set, get) => ({
     logout: async () => {
         try {
             await axiosInstance.post("/auth/logout");
-            set({ authUser: null });
             toast.success("Logged out successfully");
+            set({ authUser: null });
             // get().disconnectSocket();
-            // window.location.href = "/";
+            window.location.href = "/";
         } catch (err) {
             console.error("Logout failed: ", err);
             toast.error("Logout failed. Please try again.");
