@@ -14,7 +14,12 @@ router.post("/logout", logout);
 router.put("/edit-profile", isAuthorized, editProfile);
 
 router.get("/check-auth", isAuthorized, (req, res) => {
-    res.status(200).json({ message: "You are authorized", user: req.user });
+    res.status(200).json({
+        _id: req.user._id,
+        fullname: req.user.fullname,
+        email: req.user.email,
+        profilePicture: req.user.profilePicture,
+    });
 });
 
 export default router;
