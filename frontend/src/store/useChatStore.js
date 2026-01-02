@@ -83,7 +83,7 @@ export const useChatStore = create((set,get) => ({
 
         const optimisticMessage = {
         _id: tempId,
-        senderId: authUser.user._id,
+        senderId: authUser._id,
         receiverId: selectedChatPartner._id,
         text: messageData.text,
         image: messageData.imageUrl,

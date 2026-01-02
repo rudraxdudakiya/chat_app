@@ -1,9 +1,7 @@
 import { create } from "zustand"
-import axiosInstance from "../lib/axios"
+import axiosInstance, { baseURL as API_BASE_URL } from "../lib/axios"
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 export const useAuthStore = create((set, get) => ({
     authUser: null,
@@ -84,7 +82,7 @@ export const useAuthStore = create((set, get) => ({
         const {authUser, socket} = get();
         if (!authUser || socket?.connected) return;
 
-        const socketio = io(BASE_URL, {
+        const socketio = io(API_BASE_URL, {
             withCredentials: true,
         });
 
