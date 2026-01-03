@@ -6,6 +6,13 @@ import User from "../models/User.model.js";
 export const isAuthorized = async (req, res, next) => {
     try {
         const token = req.cookies.jwt;
+        
+        // Debug logging (remove after fixing)
+        console.log("Auth check - Cookies received:", req.cookies);
+        console.log("Auth check - JWT token:", token ? "Present" : "Missing");
+        console.log("Auth check - Origin:", req.headers.origin);
+        console.log("Auth check - NODE_ENV:", ENV.NODE_ENV);
+        
         if (!token) {
             return res.status(401).json({ message: "Unauthorized: No token provided" });
         }

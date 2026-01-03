@@ -39,7 +39,7 @@ function ProfileHeader() {
                   </center>
                 ) : (
                 <img
-                  src={imgSelected || authUser?.user?.profilePicture || "/avatar.png"}
+                  src={imgSelected || authUser?.profilePicture || "/avatar.png"}
                   alt="User image"
                   className="size-full object-cover"
                 />
