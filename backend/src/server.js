@@ -16,15 +16,26 @@ app.use(express.json({ limit: "5mb" })); //middleware to parse json body in requ
 app.use(cookieParser()); //middleware to parse cookies in request (req.cookies)
 
 // CORS configuration for multiple environments
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://chitchat-orpin-six.vercel.app',
+  ENV.CLIENT_URL
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173', // Local development
-    'https://chitchat-orpin-six.vercel.app', // Your deployed frontend
-    ENV.CLIENT_URL // Environment variable fallback
-  ].filter(Boolean), // Remove any undefined values
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  exposedHeaders: ['Set-Cookie']
 }));
 
 app.use("/api/auth", authRoutes);

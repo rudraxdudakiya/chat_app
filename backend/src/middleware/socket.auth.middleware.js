@@ -9,9 +9,12 @@ export const socketAuthMiddleware = async (socket, next) => {
             .find((row) => row.startsWith("jwt="))
             ?.split("=")[1];   
         
-            if (!token) {
-            console.log("Socket connection rejected: No token provided");
-            return next(new Error("Unauthorized - No Token Provided"));
+        if (!token) {
+            // Allow unauthenticated connections; user will authenticate after login
+            console.log("Socket connection: No token yet (user not logged in)");
+            socket.user = null;
+            socket.userId = null;
+            return next();
         }
 
         const decoded = jwt.verify(token, ENV.JWT_SECRET);

@@ -7,18 +7,25 @@ import { socketAuthMiddleware } from "../middleware/socket.auth.middleware.js";
 const app = express();
 const serverInstance = http.createServer(app);
 
+const allowedOrigins = [
+    'http://localhost:5173', // Local development
+    'http://localhost:5174',
+    'https://chitchat-orpin-six.vercel.app', // Your deployed frontend
+    ENV.CLIENT_URL // Environment variable fallback
+].filter(Boolean);
+
 const io = new Server(serverInstance, {
     cors: {
-        origin: [
-            'http://localhost:5173', // Local development
-            'https://chitchat-orpin-six.vercel.app', // Your deployed frontend
-            ENV.CLIENT_URL // Environment variable fallback
-        ].filter(Boolean), // Remove any undefined values
+        origin: allowedOrigins,
         credentials: true,
-        methods: ['GET', 'POST']
+        methods: ['GET', 'POST', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization']
     },
     allowEIO3: true, // Support older clients
-    transports: ['polling', 'websocket'], // Ensure both transports are enabled
+    transports: ['websocket', 'polling'], // Try websocket first, fallback to polling
+    pingInterval: 25000,
+    pingTimeout: 20000,
+    upgradeTimeout: 10000
 });
 
 io.use(socketAuthMiddleware);
@@ -30,6 +37,12 @@ export function getReceiverSocketId(userId) {
 }
 
 io.on("connection", (socket) => {
+    // Only handle authenticated users
+    if (!socket.user) {
+        console.log("Socket connected but user not authenticated yet");
+        return;
+    }
+
     console.log("A user connected.", socket.user.fullname);
     
     const userId = socket.user._id.toString();

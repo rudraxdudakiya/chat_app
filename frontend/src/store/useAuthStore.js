@@ -18,7 +18,12 @@ export const useAuthStore = create((set, get) => ({
             set({ authUser: res.data });
             get().connectSocket();
         } catch (err) {
-            console.error("Auth check failed: ", err);
+            // 401 is expected if user is not logged in - don't show error
+            if (err.response?.status !== 401) {
+                console.error("Auth check failed: ", err);
+            }
+            // Still try to connect socket for real-time updates
+            get().connectSocket();
         } finally {
             set({ isAuthChecking: false });
         }
@@ -79,17 +84,34 @@ export const useAuthStore = create((set, get) => ({
         }
     },
     connectSocket: () => {
-        const {authUser, socket} = get();
-        if (!authUser || socket?.connected) return;
+        const {socket} = get();
+        if (socket?.connected) return;
 
         const socketio = io(API_BASE_URL, {
             withCredentials: true,
+            reconnection: true,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            reconnectionAttempts: 5,
+            transports: ['websocket', 'polling'],
         });
 
         set({ socket: socketio });
 
         socketio.on("getOnlineUsers", (userIds) => {
             set({ onlineUsers: userIds });
+        });
+
+        socketio.on("error", (error) => {
+            console.error("Socket connection error:", error);
+        });
+
+        socketio.on("connect", () => {
+            console.log("Socket connected successfully");
+        });
+
+        socketio.on("disconnect", () => {
+            console.log("Socket disconnected");
         });
     },
     disconnectSocket: () => {
